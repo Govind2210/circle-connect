@@ -1,0 +1,217 @@
+{
+  "version": 2,
+  "projects": {
+    "api": {
+      "root": "apps/api",
+      "sourceRoot": "apps/api/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/api",
+            "main": "apps/api/src/main.ts",
+            "tsConfig": "apps/api/tsconfig.app.json",
+            "assets": [
+              "apps/api/src/assets",
+              {
+                "glob": "schema.prisma",
+                "input": "libs/prisma-client/prisma/generated/client",
+                "output": "."
+              },
+              {
+                "glob": "query-engine-darwin",
+                "input": "libs/prisma-client/prisma/generated/client",
+                "output": "."
+              },
+              {
+                "glob": "query-engine-debian-openssl-1.1.x",
+                "input": "libs/prisma-client/prisma/generated/client",
+                "output": "."
+              }
+            ]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/api/src/environments/environment.ts",
+                  "with": "apps/api/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "api:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/api/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/api"],
+          "options": {
+            "jestConfig": "apps/api/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "crud-app": {
+      "root": "apps/crud-app",
+      "sourceRoot": "apps/crud-app",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/next:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "root": "apps/crud-app",
+            "outputPath": "dist/apps/crud-app",
+            "assets": [
+              "apps/crud-app",
+              {
+                "glob": "schema.prisma",
+                "input": "libs/prisma-client/prisma/generated/client",
+                "output": "./prisma/"
+              }
+            ]
+          },
+          "configurations": {
+            "production": {}
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/next:server",
+          "options": {
+            "buildTarget": "crud-app:build",
+            "dev": true
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "crud-app:build:production",
+              "dev": false
+            }
+          }
+        },
+        "export": {
+          "executor": "@nrwl/next:export",
+          "options": {
+            "buildTarget": "crud-app:build:production"
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/crud-app"],
+          "options": {
+            "jestConfig": "apps/crud-app/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/crud-app/**/*.{ts,tsx,js,jsx}"]
+          }
+        }
+      }
+    },
+    "crud-app-e2e": {
+      "root": "apps/crud-app-e2e",
+      "sourceRoot": "apps/crud-app-e2e/src",
+      "projectType": "application",
+      "targets": {
+        "e2e": {
+          "executor": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/crud-app-e2e/cypress.json",
+            "tsConfig": "apps/crud-app-e2e/tsconfig.e2e.json",
+            "devServerTarget": "crud-app:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "crud-app:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/crud-app-e2e/**/*.{js,ts}"]
+          }
+        }
+      }
+    },
+    "prisma-client": {
+      "root": "libs/prisma-client",
+      "sourceRoot": "libs/prisma-client/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/prisma-client/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/prisma-client"],
+          "options": {
+            "jestConfig": "libs/prisma-client/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "ui": {
+      "root": "libs/ui",
+      "sourceRoot": "libs/ui/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/ui/**/*.{ts,tsx,js,jsx}"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/ui"],
+          "options": {
+            "jestConfig": "libs/ui/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/next"
+  },
+  "generators": {
+    "@nrwl/react": {
+      "application": {
+        "babel": true
+      }
+    },
+    "@nrwl/next": {
+      "application": {
+        "style": "scss",
+        "linter": "eslint"
+      }
+    }
+  },
+  "defaultProject": "api",
+  "webpackConfig": "react-tailwind.webpack.config.js"
+}
